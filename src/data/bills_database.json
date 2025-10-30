@@ -1,0 +1,31 @@
+[
+  {
+    "party": "",
+    "entry_dt": "30/10/2025",
+    "bill_no": "",
+    "bill_dt": "30/10/2025",
+    "items": [
+      {
+        "item_name": "VOLINI GEL",
+        "unit": "1",
+        "batch": "ABC123",
+        "exp_dt": "11/26",
+        "mrp": "90",
+        "qty": "5",
+        "fr": "0",
+        "ptr": "80",
+        "d_percent": "0",
+        "disc": "0",
+        "base": "400.00",
+        "gst_percent": "5",
+        "amount": "420.00",
+        "lp": "",
+        "locat": ""
+      }
+    ],
+    "total_items": 1,
+    "total_amount": 420.0,
+    "saved_at": "2025-10-30T19:04:27.236458",
+    "bill_id": "BILL_20251030_190427"
+  }
+]
