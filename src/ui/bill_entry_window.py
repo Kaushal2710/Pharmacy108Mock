@@ -234,6 +234,7 @@ class BillEntryWindow:
         self.entrydt_entry.bind('<KeyRelease>', lambda e: self.smart_date_format(self.entrydt_entry))
         self.entrydt_entry.bind('<Return>', self.on_entrydt_enter)
         self.entrydt_entry.bind('<FocusIn>', self.on_entrydt_focus)
+        self.entrydt_entry.bind('<Button-1>', self.on_entrydt_click)
         self.entrydt_entry.pack(side="left", padx=(0, 30))
         
         # Credit/Debit Dropdown
@@ -277,6 +278,8 @@ class BillEntryWindow:
         self.billno_var.trace('w', lambda *args: self.to_uppercase(self.billno_var))
         self.billno_entry.pack(side="left", padx=(0, 30))
         self.billno_entry.bind('<Return>', self.on_billno_enter)
+        self.billno_entry.bind('<FocusIn>', self.on_billno_focus)
+        self.billno_entry.bind('<Button-1>', self.on_billno_click)
         
         # Tax Dropdown
         self.tax_var = StringVar()
@@ -319,6 +322,7 @@ class BillEntryWindow:
         self.billdt_entry.bind('<KeyRelease>', lambda e: self.smart_date_format(self.billdt_entry))
         self.billdt_entry.bind('<Return>', self.on_billdt_enter)
         self.billdt_entry.bind('<FocusIn>', self.on_billdt_focus)
+        self.billdt_entry.bind('<Button-1>', self.on_billdt_click)
         self.billdt_entry.pack(side="left", padx=(0, 30))
         
         # Empty Input Box
@@ -845,32 +849,45 @@ class BillEntryWindow:
     def on_empty_input1_enter(self, event):
         """Handle Enter key in empty input 1 - move to EntryDt and select all"""
         self.entrydt_entry.focus_set()
-        # Use after() to delay selection so it stays selected
-        self.master.after(1, lambda: self.select_all_text(self.entrydt_entry))
+        self.schedule_select_all(self.entrydt_entry)
         return "break"
     
     def on_entrydt_focus(self, event):
         """Auto-select all text when EntryDt gets focus"""
-        # Use after() to delay selection
-        self.master.after(1, lambda: self.select_all_text(self.entrydt_entry))
+        self.schedule_select_all(self.entrydt_entry)
+    
+    def on_entrydt_click(self, event):
+        """Handle mouse click on EntryDt - select all text"""
+        return self.handle_entry_click_select_all(self.entrydt_entry)
     
     def on_entrydt_enter(self, event):
         """Handle Enter key in EntryDt - move to BillNo"""
         self.billno_entry.focus_set()
+        self.schedule_select_all(self.billno_entry)
         return "break"
+    
+    def on_billno_focus(self, event):
+        """Auto-select all text when BillNo gets focus"""
+        self.schedule_select_all(self.billno_entry)
+    
+    def on_billno_click(self, event):
+        """Handle mouse click on BillNo - select all text"""
+        return self.handle_entry_click_select_all(self.billno_entry)
     
     def on_billno_enter(self, event):
         """Handle Enter key in BillNo - move to Bill Dt and select all"""
         self.billdt_entry.focus_set()
-        # Use after() to delay selection so it stays selected
-        self.master.after(1, lambda: self.select_all_text(self.billdt_entry))
+        self.schedule_select_all(self.billdt_entry)
         return "break"
     
     def on_billdt_focus(self, event):
         """Auto-select all text when Bill Dt gets focus"""
-        # Use after() to delay selection
-        self.master.after(1, lambda: self.select_all_text(self.billdt_entry))
+        self.schedule_select_all(self.billdt_entry)
     
+    def on_billdt_click(self, event):
+        """Handle mouse click on Bill Dt - select all text"""
+        return self.handle_entry_click_select_all(self.billdt_entry)
+
     def on_billdt_enter(self, event):
         """Handle Enter key in Bill Dt - move to Credit/Debit dropdown"""
         self.credit_debit_dropdown.focus_set()
@@ -1200,20 +1217,46 @@ class BillEntryWindow:
                     entry.bind('<Up>', self.on_item_up_arrow)
                     entry.bind('<Return>', self.on_item_enter_key)
                     entry.bind('<Escape>', self.on_item_escape_key)
-                elif col == 5:  # Mrp column - special navigation to New MRP
+                elif col == 3:  # Batch column - auto-select on focus
+                    entry.bind('<FocusIn>', lambda e, ent=entry: self.schedule_select_all(ent))
+                    entry.bind('<Button-1>', lambda e, ent=entry: self.handle_entry_click_select_all(ent))
+                    entry.bind('<Return>', lambda e, c=col: self.on_search_row_enter(e, c))
+                    entry.bind('<Tab>', lambda e, c=col: self.on_search_row_tab(e, c))
+                elif col == 4:  # ExpDt column - auto-select on focus
+                    entry.bind('<FocusIn>', lambda e, ent=entry: self.schedule_select_all(ent))
+                    entry.bind('<Button-1>', lambda e, ent=entry: self.handle_entry_click_select_all(ent))
+                    entry.bind('<Return>', lambda e, c=col: self.on_search_row_enter(e, c))
+                    entry.bind('<Tab>', lambda e, c=col: self.on_search_row_tab(e, c))
+                elif col == 5:  # Mrp column - auto-select on focus and special navigation to New MRP
+                    entry.bind('<FocusIn>', lambda e, ent=entry: self.schedule_select_all(ent))
+                    entry.bind('<Button-1>', lambda e, ent=entry: self.handle_entry_click_select_all(ent))
                     entry.bind('<Return>', self.on_mrp_enter)
                     entry.bind('<Tab>', lambda e, c=col: self.on_search_row_tab(e, c))
-                elif col == 8:  # PTR column - calculate BASE on change
+                elif col == 8:  # PTR column - auto-select on focus and calculate BASE on change
+                    entry.bind('<FocusIn>', lambda e, ent=entry: self.schedule_select_all(ent))
+                    entry.bind('<Button-1>', lambda e, ent=entry: self.handle_entry_click_select_all(ent))
                     entry.bind('<KeyRelease>', lambda e: self.calculate_base())
                     entry.bind('<Return>', lambda e, c=col: self.on_search_row_enter(e, c))
                     entry.bind('<Tab>', lambda e, c=col: self.on_search_row_tab(e, c))
+                elif col == 9:  # D% column - auto-select on focus
+                    entry.bind('<FocusIn>', lambda e, ent=entry: self.schedule_select_all(ent))
+                    entry.bind('<Button-1>', lambda e, ent=entry: self.handle_entry_click_select_all(ent))
+                    entry.bind('<Return>', lambda e, c=col: self.on_search_row_enter(e, c))
+                    entry.bind('<Tab>', lambda e, c=col: self.on_search_row_tab(e, c))
+                elif col == 10:  # Disc column - auto-select on focus
+                    entry.bind('<FocusIn>', lambda e, ent=entry: self.schedule_select_all(ent))
+                    entry.bind('<Button-1>', lambda e, ent=entry: self.handle_entry_click_select_all(ent))
+                    entry.bind('<Return>', lambda e, c=col: self.on_search_row_enter(e, c))
+                    entry.bind('<Tab>', lambda e, c=col: self.on_search_row_tab(e, c))
                 elif col == 12:  # Gst% column - auto-select on focus and calculate Amount
-                    entry.bind('<FocusIn>', lambda e, ent=entry: self.select_all_text(ent))
-                    entry.bind('<Button-1>', lambda e, ent=entry: self.master.after(10, lambda: self.select_all_text(ent)))
+                    entry.bind('<FocusIn>', lambda e, ent=entry: self.schedule_select_all(ent))
+                    entry.bind('<Button-1>', lambda e, ent=entry: self.handle_entry_click_select_all(ent))
                     entry.bind('<KeyRelease>', lambda e: self.calculate_amount())
                     entry.bind('<Return>', lambda e, c=col: self.on_search_row_enter(e, c))
                     entry.bind('<Tab>', lambda e, c=col: self.on_search_row_tab(e, c))
-                elif col == 15:  # Locat column - save item and add to table
+                elif col == 15:  # Locat column - auto-select on focus and save item on Enter
+                    entry.bind('<FocusIn>', lambda e, ent=entry: self.schedule_select_all(ent))
+                    entry.bind('<Button-1>', lambda e, ent=entry: self.handle_entry_click_select_all(ent))
                     entry.bind('<Return>', self.on_locat_enter)
                     entry.bind('<Tab>', lambda e, c=col: self.on_search_row_tab(e, c))
                 else:
@@ -1348,9 +1391,23 @@ class BillEntryWindow:
         return self.on_table_enter(event, row, col)
     
     def select_all_text(self, entry_widget):
-        """Select all text in an entry widget"""
-        entry_widget.select_range(0, END)
-        entry_widget.icursor(END)
+        """Select all text in an entry widget if it still has focus"""
+        try:
+            if entry_widget and entry_widget == self.master.focus_get():
+                entry_widget.selection_range(0, END)
+                entry_widget.icursor(END)
+        except Exception as e:
+            print(f"Error selecting text: {e}")
+
+    def schedule_select_all(self, entry_widget, delays=(0, 40, 120)):
+        """Schedule select-all across small delays to survive widget updates"""
+        for delay in delays:
+            self.master.after(delay, lambda ew=entry_widget: self.select_all_text(ew))
+
+    def handle_entry_click_select_all(self, entry_widget):
+        """Common handler for mouse click bindings that should select all"""
+        self.schedule_select_all(entry_widget)
+        return "break"
     
     def nav_click(self, button_name):
         """Handle navigation button clicks"""

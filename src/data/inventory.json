@@ -746,7 +746,7 @@
     "batch": "PCM5002",
     "exp_dt": "09/26",
     "mrp": "25",
-    "qty": "75",
+    "qty": "75.0",
     "fr": "0",
     "ptr": "18",
     "d_percent": "0",
@@ -757,7 +757,7 @@
     "lp": "",
     "locat": "A1",
     "added_at": "2025-10-30T19:25:00.000000",
-    "last_updated": "2025-10-30T19:25:00.000000"
+    "last_updated": "2025-10-30T20:35:13.607541"
   },
   {
     "item_name": "PARACETAMOL 500MG",
@@ -986,5 +986,24 @@
     "locat": "C1",
     "added_at": "2025-10-30T19:25:00.000000",
     "last_updated": "2025-10-30T19:25:00.000000"
+  },
+  {
+    "item_name": "AZITHROMYCIN 500MG",
+    "unit": "6",
+    "batch": "AZI5003J",
+    "exp_dt": "12/25",
+    "mrp": "120",
+    "qty": "5",
+    "fr": "01",
+    "ptr": "95",
+    "d_percent": "0",
+    "disc": "0",
+    "base": "475.00",
+    "gst_percent": "12",
+    "amount": "532.00",
+    "lp": "",
+    "locat": "",
+    "added_at": "2025-10-30T20:35:13.607768",
+    "last_updated": "2025-10-30T20:35:13.607776"
   }
 ]
